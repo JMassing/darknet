@@ -8,6 +8,7 @@ class DarknetConan(ConanFile):
     author = "Julian Massing julimassing@gmail.com"
     settings = "os", "compiler", "build_type", "arch"
     generators = "cmake"
+    options = {"vcpkg_path" : "ANY" }
     exports_sources = "*"
 
     def source(self):
@@ -37,30 +38,15 @@ class DarknetConan(ConanFile):
         cmake.definitions["VCPKG_USE_OPENCV2"] = "OFF"
         cmake.definitions["VCPKG_USE_OPENCV3"] = "OFF"
         cmake.definitions["VCPKG_USE_OPENCV4"] = "ON"
-        vcpkg_toolchainfile = Path(self.source_folder) / "external/vcpkg/scripts/buildsystems/vcpkg.cmake"
+        vcpkg_toolchainfile = Path(str(self.options.get_safe("vcpkg_path"))) / "scripts/buildsystems/vcpkg.cmake"
         cmake.definitions["CMAKE_TOOLCHAIN_FILE"] = vcpkg_toolchainfile.resolve().as_posix()
         cmake.configure()
         cmake.build()
-        cmake.test()
 
     def package(self):
-        pass
-        # if self.settings.os == "Windows":
-        #     tools.rename("app/config_windows.ini", "app/config.ini")
-        # else:
-        #     tools.rename("app/config_linux.ini", "app/config.ini")
-
-        # self.copy("*.lib", dst="lib", keep_path=False)
-        # self.copy("*.dll", dst="bin", keep_path=False)
-        # self.copy("*.so", dst="lib", keep_path=False)
-        # self.copy("*.a", dst="lib", keep_path=False)
-        # self.copy("Pokerbot.exe", dst="bin", src="bin", keep_path=False)
-        # self.copy("Pokerbot", dst="bin", src="bin", keep_path=False)
-        # self.copy("Card_Imgs/*", dst="", keep_path=True)
-        # self.copy("app/config.ini", dst="", keep_path=False)
-        # self.copy("app/imgui.ini", dst="bin", keep_path=False) 
- 
+        self.copy("*.lib", src="Release", dst="lib", keep_path=False)
+        self.copy("*.exp", src="Release", dst="lib", keep_path=False)
+        self.copy("*.dll", src="Release", dst="bin", keep_path=False)
+       
     def package_info(self):
         pass
-        #self.cpp_info.libs = ["opencv", "boost", "gtest"]
-
